@@ -2,103 +2,78 @@
 
 namespace app\models;
 
-class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
+use Yii;
+use yii\behaviors\TimestampBehavior;
+
+/**
+ * This is the model class for table "user".
+ *
+ * @property int $id
+ * @property string $fio
+ * @property string $phone
+ * @property string $created_at
+ * @property string $updated_at
+ *
+ * @property Book[] $books
+ * @property BookIssueLog[] $bookIssueLogs
+ */
+class User extends \yii\db\ActiveRecord
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
 
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function findIdentity($id)
+    public function behaviors()
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return [
+            TimestampBehavior::class,
+        ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function findIdentityByAccessToken($token, $type = null)
+    public static function tableName()
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
-    public static function findByUsername($username)
-    {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return 'user';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getId()
+    public function rules()
     {
-        return $this->id;
+        return [
+            [['created_at', 'updated_at'], 'safe'],
+            [['fio', 'phone'], 'string', 'max' => 255],
+            [['phone'], 'unique'],
+        ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAuthKey()
+    public function attributeLabels()
     {
-        return $this->authKey;
+        return [
+            'id' => 'ID',
+            'fio' => 'Fio',
+            'phone' => 'Phone',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
+        ];
     }
 
     /**
-     * {@inheritdoc}
+     * @return \yii\db\ActiveQuery
      */
-    public function validateAuthKey($authKey)
+    public function getBooks()
     {
-        return $this->authKey === $authKey;
+        return $this->hasMany(Book::className(), ['taken_by' => 'id']);
     }
 
     /**
-     * Validates password
-     *
-     * @param string $password password to validate
-     * @return bool if password provided is valid for current user
+     * @return \yii\db\ActiveQuery
      */
-    public function validatePassword($password)
+    public function getBookIssueLogs()
     {
-        return $this->password === $password;
+        return $this->hasMany(BookIssueLog::className(), ['user_id' => 'id']);
     }
 }

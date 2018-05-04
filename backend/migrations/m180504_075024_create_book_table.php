@@ -7,25 +7,29 @@ use yii\db\Migration;
  */
 class m180504_075024_create_book_table extends Migration
 {
+    private $tableName = 'book';
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('book', [
-            'id'         => $this->primaryKey(),
-            'author_id'  => $this->integer()->notNull(),
-            'name'       => $this->string()->notNull(),
-            'taken_by'   => $this->integer()->defaultValue(null),
-            'issued_at'  => $this->timestamp()->defaultValue(null),
-            'created_at' => $this->timestamp()->notNull(),
-            'updated_at' => $this->timestamp()->notNull(),
-        ]);
+        if (!$this->db->getTableSchema($this->tableName)) {
+            $this->createTable($this->tableName, [
+                'id'         => $this->primaryKey(),
+                'author_id'  => $this->integer()->notNull(),
+                'name'       => $this->string()->notNull(),
+                'taken_by'   => $this->integer()->defaultValue(null),
+                'issued_at'  => $this->timestamp()->defaultValue(null),
+                'created_at' => $this->timestamp()->defaultValue(null),
+                'updated_at' => $this->timestamp()->defaultValue(null),
+            ]);
+        }
 
-        $this->createIndex('idx_name_author_id', 'book', ['name', 'author_id'], true);
+
+        $this->createIndex('idx_name_author_id', $this->tableName, ['name', 'author_id'], true);
         $this->addForeignKey(
             'fk_author_id',
-            'book',
+            $this->tableName,
             'author_id',
             'author',
             'id',
@@ -34,11 +38,11 @@ class m180504_075024_create_book_table extends Migration
         );
         $this->addForeignKey(
             'fk_taken_by',
-            'book',
+            $this->tableName,
             'taken_by',
             'user',
             'id',
-            'SET DEFAULT',
+            'SET NULL',
             'NO ACTION'
         );
     }
@@ -48,8 +52,8 @@ class m180504_075024_create_book_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey('fk_author_id', 'book');
-        $this->dropIndex('idx_name_author_id', 'book');
-        $this->dropTable('book');
+        $this->dropForeignKey('fk_author_id', $this->tableName);
+        $this->dropIndex('idx_name_author_id', $this->tableName);
+        $this->dropTable($this->tableName);
     }
 }

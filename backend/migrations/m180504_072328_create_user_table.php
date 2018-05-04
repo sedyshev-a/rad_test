@@ -16,8 +16,8 @@ class m180504_072328_create_user_table extends Migration
             'id' => $this->primaryKey(),
             'fio' => $this->string(),
             'phone' => $this->string()->unique(),
-            'created_at' => $this->timestamp(),
-            'updated_at' => $this->timestamp(),
+            'created_at' => $this->timestamp()->defaultValue(null),
+            'updated_at' => $this->timestamp()->defaultValue(null),
         ]);
     }
 

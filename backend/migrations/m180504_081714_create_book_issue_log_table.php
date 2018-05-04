@@ -14,7 +14,7 @@ class m180504_081714_create_book_issue_log_table extends Migration
     {
         $this->createTable('book_issue_log', [
             'id' => $this->primaryKey(),
-            'date' => $this->timestamp(),
+            'date' => $this->timestamp()->defaultValue(null),
             'type' => $this->string(),
             'user_id' => $this->integer(),
             'book_id' => $this->integer(),

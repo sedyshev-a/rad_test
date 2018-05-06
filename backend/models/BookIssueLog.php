@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "book_issue_log".
  *
@@ -18,6 +16,9 @@ use Yii;
  */
 class BookIssueLog extends \yii\db\ActiveRecord
 {
+    const TYPE_ISSUE = 'issue';
+    const TYPE_RETURN = 'return';
+
     /**
      * {@inheritdoc}
      */
@@ -34,9 +35,9 @@ class BookIssueLog extends \yii\db\ActiveRecord
         return [
             [['date'], 'safe'],
             [['user_id', 'book_id'], 'integer'],
-            [['type'], 'string', 'max' => 255],
-            [['book_id'], 'exist', 'skipOnError' => true, 'targetClass' => Book::className(), 'targetAttribute' => ['book_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['type'], 'in', 'range' => [self::TYPE_ISSUE, self::TYPE_RETURN]],
+            [['book_id'], 'exist', 'skipOnError' => true, 'targetClass' => Book::class, 'targetAttribute' => ['book_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 

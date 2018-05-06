@@ -6,7 +6,7 @@ namespace app\controllers\api;
  * Time: 11:55
  */
 
-use yii\base\Model;
+use app\exceptions\ModelValidationException;
 use yii\filters\ContentNegotiator;
 use yii\web\Response;
 
@@ -28,9 +28,14 @@ abstract class BaseApiController extends \yii\rest\Controller
         ];
     }
 
-    protected function sendErrorResponse(Model $model) {
+    protected function sendErrorResponse(\Exception $e) {
+        if ($e instanceof ModelValidationException) {
+            return [
+                'errors' => $e->getModelErrors()
+            ];
+        }
         return [
-            'errors' => $model->getErrors()
+            'error' => $e->getMessage(),
         ];
     }
 }

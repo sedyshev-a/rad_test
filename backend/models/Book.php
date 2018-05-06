@@ -2,25 +2,35 @@
 
 namespace app\models;
 
-use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "book".
  *
  * @property int $id
- * @property int $author_id
+ * @property string $author_name
  * @property string $name
  * @property int $taken_by
  * @property string $issued_at
  * @property string $created_at
  * @property string $updated_at
  *
- * @property Author $author
  * @property User $takenBy
  * @property BookIssueLog[] $bookIssueLogs
  */
 class Book extends \yii\db\ActiveRecord
 {
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'value' => date('Y-m-d H:i:s'),
+            ]
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -35,12 +45,11 @@ class Book extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['author_id', 'name'], 'required'],
-            [['author_id', 'taken_by'], 'integer'],
+            [['author_name', 'name'], 'required'],
+            [['taken_by'], 'integer'],
             [['issued_at', 'created_at', 'updated_at'], 'safe'],
-            [['name'], 'string', 'max' => 255],
-            [['name', 'author_id'], 'unique', 'targetAttribute' => ['name', 'author_id']],
-            [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Author::className(), 'targetAttribute' => ['author_id' => 'id']],
+            [['name', 'author_name'], 'string', 'max' => 255],
+            [['name', 'author_name'], 'unique', 'targetAttribute' => ['name', 'author_name']],
             [['taken_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['taken_by' => 'id']],
         ];
     }
@@ -52,21 +61,13 @@ class Book extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'author_id' => 'Author ID',
+            'author_name' => 'Author name',
             'name' => 'Name',
             'taken_by' => 'Taken By',
             'issued_at' => 'Issued At',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAuthor()
-    {
-        return $this->hasOne(Author::className(), ['id' => 'author_id']);
     }
 
     /**

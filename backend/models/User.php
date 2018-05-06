@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use Yii;
 use yii\behaviors\TimestampBehavior;
 
 /**
@@ -23,7 +22,10 @@ class User extends \yii\db\ActiveRecord
     public function behaviors()
     {
         return [
-            TimestampBehavior::class,
+            [
+                'class' => TimestampBehavior::class,
+                'value' => date('Y-m-d H:i:s'),
+            ]
         ];
     }
 
@@ -43,6 +45,7 @@ class User extends \yii\db\ActiveRecord
         return [
             [['created_at', 'updated_at'], 'safe'],
             [['fio', 'phone'], 'string', 'max' => 255],
+            [['fio', 'phone'], 'required'],
             [['phone'], 'unique'],
         ];
     }

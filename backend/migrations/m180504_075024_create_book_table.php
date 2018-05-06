@@ -16,7 +16,7 @@ class m180504_075024_create_book_table extends Migration
         if (!$this->db->getTableSchema($this->tableName)) {
             $this->createTable($this->tableName, [
                 'id'         => $this->primaryKey(),
-                'author_id'  => $this->integer()->notNull(),
+                'author_name'  => $this->string()->notNull(),
                 'name'       => $this->string()->notNull(),
                 'taken_by'   => $this->integer()->defaultValue(null),
                 'issued_at'  => $this->timestamp()->defaultValue(null),
@@ -26,16 +26,7 @@ class m180504_075024_create_book_table extends Migration
         }
 
 
-        $this->createIndex('idx_name_author_id', $this->tableName, ['name', 'author_id'], true);
-        $this->addForeignKey(
-            'fk_author_id',
-            $this->tableName,
-            'author_id',
-            'author',
-            'id',
-            'CASCADE',
-            'NO ACTION'
-        );
+        $this->createIndex('idx_name_author_name', $this->tableName, ['name', 'author_name'], true);
         $this->addForeignKey(
             'fk_taken_by',
             $this->tableName,

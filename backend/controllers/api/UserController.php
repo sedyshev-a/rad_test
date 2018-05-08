@@ -10,6 +10,7 @@ use app\exceptions\BookIssueException;
 use app\exceptions\BookReturnException;
 use app\exceptions\ModelValidationException;
 use app\exceptions\UserAddException;
+use app\repositories\BookIssueLogRepository;
 use app\repositories\BookRepository;
 use app\repositories\UserRepository;
 use app\services\UserService;
@@ -130,6 +131,14 @@ class UserController extends BaseApiController
         } catch (BookReturnException $e) {
             return $this->sendErrorResponse($e);
         }
+    }
+
+    public function actionGetLog($userId)
+    {
+        /** @var BookIssueLogRepository $logRepository */
+        $logRepository = Yii::$container->get(BookIssueLogRepository::class);
+
+        return $logRepository->findRecentByUserId($userId);
     }
 
 }
